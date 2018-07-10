@@ -5,6 +5,8 @@
 server_ip=(root@192.168.11.72 root@192.168.11.73)
 server_pwd=(root root)
 image_sourcedir=/root/temp/partner/image/
+CMD_PROMPT="\](\$|#)"
+myscript="/root/loadimage.sh"
 
 mycount=0
 
@@ -36,16 +38,29 @@ for cur_ip in ${server_ip[@]}
         }
 			"*assword:" {
    				send "$cur_pwd\n"
-					#exp_continue   		
+					exp_continue   		
    			}   			
 		}
+				
+		#将镜像文件LOAD到本地仓库
+		spawn ssh $cur_ip
 		
-		#interact
-		
+		expect {
+			"*assword:" {
+   				send "$cur_pwd\n"
+   			}
+   	}
+   	
+   	expect -re $CMD_PROMPT  
+    send -- $myscript\r 
+    
+    expect -re $CMD_PROMPT  
+    exit
+        		
 		expect eof
 		EOF
 		
-		
+	  
 		mycount=$(($mycount+1))
 	done
 
